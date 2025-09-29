@@ -1,0 +1,266 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ title }} - Panel de Administración{% endblock %}
+
+{% block breadcrumb %}
+    <li class="text-gray-400">
+        <i class="fas fa-chevron-right mx-2"></i>
+        <a href="{% url 'panel_admin:products_list' %}" class="hover:text-blue-600">Productos</a>
+    </li>
+    <li class="text-gray-400">
+        <i class="fas fa-chevron-right mx-2"></i>
+        {{ title }}
+    </li>
+{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
+            {% if action == 'edit' %}
+                <p class="text-gray-600 mt-1">Modifica la información del producto</p>
+            {% else %}
+                <p class="text-gray-600 mt-1">Completa la información para crear un nuevo producto</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'panel_admin:products_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+            <i class="fas fa-arrow-left"></i>
+            <span>Volver a lista</span>
+        </a>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Columna principal -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Información básica -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Información Básica</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                            {{ form.brand }}
+                            {% if form.brand.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.brand.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Modelo</label>
+                            {{ form.model }}
+                            {% if form.model.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.model.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción Corta</label>
+                            {{ form.short_description }}
+                            {% if form.short_description.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.short_description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción Completa</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Precios e inventario -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Precios e Inventario</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Precio de Venta *</label>
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.price.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Precio de Comparación</label>
+                            {{ form.compare_price }}
+                            {% if form.compare_price.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.compare_price.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Precio de Costo</label>
+                            {{ form.cost_price }}
+                            {% if form.cost_price.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.cost_price.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Stock Actual *</label>
+                            {{ form.stock_quantity }}
+                            {% if form.stock_quantity.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.stock_quantity.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo</label>
+                            {{ form.min_stock_level }}
+                            {% if form.min_stock_level.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.min_stock_level.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Características físicas -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Características Físicas</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+                            {{ form.weight }}
+                            {% if form.weight.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.weight.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dimensiones</label>
+                            {{ form.dimensions }}
+                            {% if form.dimensions.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.dimensions.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">SEO</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Título SEO</label>
+                            {{ form.meta_title }}
+                            {% if form.meta_title.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.meta_title.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción SEO</label>
+                            {{ form.meta_description }}
+                            {% if form.meta_description.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.meta_description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Estados y configuración -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Estado y Configuración</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.category.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.status.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                {{ form.is_featured }}
+                                <label class="ml-2 text-sm text-gray-700">Producto destacado</label>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                {{ form.is_digital }}
+                                <label class="ml-2 text-sm text-gray-700">Producto digital</label>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                {{ form.requires_shipping }}
+                                <label class="ml-2 text-sm text-gray-700">Requiere envío</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if action == 'edit' and product %}
+                <!-- Imágenes actuales -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900">Imágenes</h2>
+                        <a href="{% url 'panel_admin:product_images' product.id %}" class="text-blue-600 hover:text-blue-800 text-sm">
+                            Gestionar imágenes →
+                        </a>
+                    </div>
+                    {% if images %}
+                        <div class="grid grid-cols-2 gap-2">
+                            {% for image in images|slice:":4" %}
+                                <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="w-full h-20 object-cover rounded">
+                            {% endfor %}
+                        </div>
+                        {% if images|length > 4 %}
+                            <p class="text-sm text-gray-500 mt-2">Y {{ images|length|add:"-4" }} más...</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-gray-500 text-sm">Sin imágenes</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Acciones -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Acciones</h2>
+                    <div class="space-y-3">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            {% if action == 'edit' %}Actualizar Producto{% else %}Crear Producto{% endif %}
+                        </button>
+                        
+                        <a href="{% url 'panel_admin:products_list' %}" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors block text-center">
+                            <i class="fas fa-times mr-2"></i>Cancelar
+                        </a>
+                        
+                        {% if action == 'edit' and product %}
+                            <a href="{% url 'panel_admin:product_images' product.id %}" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors block text-center">
+                                <i class="fas fa-images mr-2"></i>Gestionar Imágenes
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

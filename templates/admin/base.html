@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel de Administración - Motorcycle World{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-yellow-500 shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo y título -->
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                        <i class="fas fa-motorcycle text-blue-900 text-2xl"></i>
+                        <span class="font-bold text-blue-900 text-xl">Motorcycle World</span>
+                    </a>
+                    <span class="text-blue-900 font-semibold">| Panel de Administración</span>
+                </div>
+
+                <!-- Navegación admin -->
+                <nav class="hidden md:flex space-x-6">
+                    <a href="{% url 'panel_admin:dashboard' %}" class="text-blue-900 hover:text-blue-700 font-medium">
+                        <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'panel_admin:products_list' %}" class="text-blue-900 hover:text-blue-700 font-medium">
+                        <i class="fas fa-box mr-1"></i>Productos
+                    </a>
+                    <a href="{% url 'panel_admin:categories_list' %}" class="text-blue-900 hover:text-blue-700 font-medium">
+                        <i class="fas fa-tags mr-1"></i>Categorías
+                    </a>
+                </nav>
+
+                <!-- Usuario y acciones -->
+                <div class="flex items-center space-x-4">
+                    <span class="text-blue-900 font-medium">
+                        <i class="fas fa-user-shield mr-1"></i>{{ user.first_name|default:user.username }}
+                    </span>
+                    <a href="{% url 'home' %}" class="text-blue-900 hover:text-blue-700">
+                        <i class="fas fa-home mr-1"></i>Volver a la tienda
+                    </a>
+                    <a href="{% url 'logout' %}" class="text-blue-900 hover:text-blue-700">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+                <li><a href="{% url 'panel_admin:dashboard' %}" class="hover:text-blue-600">Administración</a></li>
+                {% block breadcrumb %}{% endblock %}
+            </ol>
+        </nav>
+
+        <!-- Mensajes -->
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-100 border border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-400 text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-700 px-4 py-3 rounded mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} mr-2"></i>
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Contenido de la página -->
+        <div class="bg-white rounded-lg shadow">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="text-center">
+                <p>&copy; 2024 Motorcycle World - Panel de Administración</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        // Función para confirmar eliminaciones
+        function confirmDelete(message = '¿Estás seguro de que quieres eliminar este elemento?') {
+            return confirm(message);
+        }
+
+        // Función para manejar respuestas AJAX
+        function handleAjaxResponse(response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert('Error: ' + response.message);
+            }
+        }
+
+        // Auto-hide alerts después de 5 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

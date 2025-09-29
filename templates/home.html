@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motorcycle World - Premium Motorcycle Accessories</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1f2937',
+                        secondary: '#f59e0b',
+                        accent: '#dc2626'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-primary text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold text-secondary">Motorcycle World</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="hover:text-secondary transition-colors">Home</a>
+                    <a href="#products" class="hover:text-secondary transition-colors">Products</a>
+                    <a href="#categories" class="hover:text-secondary transition-colors">Categories</a>
+                    <a href="#contact" class="hover:text-secondary transition-colors">Contact</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated %}
+                        <!-- Usuario autenticado -->
+                        <div class="flex items-center space-x-4">
+                            <span class="text-white">¡Hola, {{ user.first_name|default:user.username }}!</span>
+                            {% if user.role == 'admin' %}
+                                <a href="{% url 'admin_dashboard' %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                                    <i class="fas fa-cog mr-1"></i>Panel Admin
+                                </a>
+                            {% endif %}
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click="open = !open" class="bg-secondary text-primary px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors flex items-center">
+                                    <i class="fas fa-user mr-2"></i>Mi Cuenta
+                                    <i class="fas fa-chevron-down ml-1"></i>
+                                </button>
+                                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                        <i class="fas fa-user mr-2"></i>Perfil
+                                    </a>
+                                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                        <i class="fas fa-shopping-bag mr-2"></i>Mis Pedidos
+                                    </a>
+                                    {% if user.role == 'admin' %}
+                                        <div class="border-t border-gray-200 my-1"></div>
+                                        <a href="{% url 'admin_dashboard' %}" class="block px-4 py-2 text-red-600 hover:bg-red-50">
+                                            <i class="fas fa-cog mr-2"></i>Panel Admin
+                                        </a>
+                                    {% endif %}
+                                    <div class="border-t border-gray-200 my-1"></div>
+                                    <a href="{% url 'logout' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Usuario no autenticado -->
+                        <button id="loginBtn" class="bg-secondary text-primary px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors">Login</button>
+                        <button id="registerBtn" class="border border-secondary text-secondary px-4 py-2 rounded-lg hover:bg-secondary hover:text-primary transition-colors">Register</button>
+                    {% endif %}
+                    <button id="cartBtn" class="relative p-2 hover:text-secondary transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 8h11M7 13L5.4 5M7 13h10"></path>
+                        </svg>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-primary to-gray-800 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-bold mb-6">Premium Motorcycle Accessories</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Discover the finest collection of motorcycle gear, parts, and accessories. Built for riders, by riders.</p>
+            <button id="shopNowBtn" class="bg-secondary text-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-yellow-600 transition-colors">Shop Now</button>
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section id="categories" class="py-16">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12 text-primary">Featured Categories</h3>
+            <div id="categoriesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Categories will be loaded here via API -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="products" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center mb-12 text-primary">Featured Products</h3>
+            <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Products will be loaded here via API -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-secondary">Motorcycle World</h4>
+                    <p class="text-gray-300">Your trusted partner for premium motorcycle accessories and gear.</p>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-4">Quick Links</h5>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-secondary transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-secondary transition-colors">Shipping Info</a></li>
+                        <li><a href="#" class="hover:text-secondary transition-colors">Returns</a></li>
+                        <li><a href="#" class="hover:text-secondary transition-colors">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-4">Categories</h5>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-secondary transition-colors">Helmets</a></li>
+                        <li><a href="#" class="hover:text-secondary transition-colors">Jackets</a></li>
+                        <li><a href="#" class="hover:text-secondary transition-colors">Gloves</a></li>
+                        <li><a href="#" class="hover:text-secondary transition-colors">Boots</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-4">Contact</h5>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>Email: info@motorcycleworld.com</li>
+                        <li>Phone: +1 (555) 123-4567</li>
+                        <li>Address: 123 Bike Street, Rider City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2025 Motorcycle World. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-primary">Login</h3>
+                    <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                        <input type="text" id="username" name="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                    </div>
+                    <button type="submit" class="w-full bg-secondary text-primary py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors font-semibold">Login</button>
+                </form>
+                <div id="loginMessage" class="mt-4 text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-primary">Register</h3>
+                    <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="registerForm">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
+                            <input type="text" name="first_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
+                            <input type="text" name="last_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                        <input type="text" name="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input type="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
+                        <input type="password" name="password_confirm" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-secondary" required>
+                    </div>
+                    <button type="submit" class="w-full bg-secondary text-primary py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors font-semibold">Register</button>
+                </form>
+                <div id="registerMessage" class="mt-4 text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

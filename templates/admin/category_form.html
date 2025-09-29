@@ -1,0 +1,98 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ title }} - Panel de Administración{% endblock %}
+
+{% block breadcrumb %}
+    <li class="text-gray-400">
+        <i class="fas fa-chevron-right mx-2"></i>
+        <a href="{% url 'panel_admin:categories_list' %}" class="hover:text-blue-600">Categorías</a>
+    </li>
+    <li class="text-gray-400">
+        <i class="fas fa-chevron-right mx-2"></i>
+        {{ title }}
+    </li>
+{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
+            {% if action == 'edit' %}
+                <p class="text-gray-600 mt-1">Modifica la información de la categoría</p>
+            {% else %}
+                <p class="text-gray-600 mt-1">Completa la información para crear una nueva categoría</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'panel_admin:categories_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+            <i class="fas fa-arrow-left"></i>
+            <span>Volver a lista</span>
+        </a>
+    </div>
+
+    <div class="max-w-2xl">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Información de la Categoría</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Categoría *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría Padre</label>
+                        {{ form.parent }}
+                        {% if form.parent.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.parent.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-sm text-gray-500 mt-1">Deja vacío para crear una categoría raíz</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Orden de Visualización</label>
+                            {{ form.sort_order }}
+                            {% if form.sort_order.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.sort_order.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex items-center pt-6">
+                            {{ form.is_active }}
+                            <label class="ml-2 text-sm text-gray-700">Categoría activa</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="flex space-x-4">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg transition-colors">
+                    <i class="fas fa-save mr-2"></i>
+                    {% if action == 'edit' %}Actualizar Categoría{% else %}Crear Categoría{% endif %}
+                </button>
+                
+                <a href="{% url 'panel_admin:categories_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg transition-colors">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

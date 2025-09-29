@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motorcycle World - Accesorios y Gear para Motociclistas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ml-yellow': '#fff159',
+                        'ml-blue': '#3483fa',
+                        'ml-light-blue': '#4593fc',
+                        'ml-gray': '#666666',
+                        'ml-light-gray': '#f5f5f5',
+                        'ml-green': '#00a650',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-ml-light-gray">
+    <!-- Header Superior -->
+    <div class="bg-ml-yellow text-xs py-1">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex space-x-4">
+                <span>📍 Enviar a tu ubicación</span>
+                <span>🎯 Categorías</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:underline">Disney</a>
+                <a href="#" class="hover:underline">Ofertas</a>
+                <a href="#" class="hover:underline">Historial</a>
+                <a href="#" class="hover:underline">Moda</a>
+                <a href="#" class="hover:underline">Supermercado</a>
+                <a href="#" class="hover:underline">Vender</a>
+                <a href="#" class="hover:underline">Ayuda</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Principal -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-ml-blue mr-8">
+                        <i class="fas fa-motorcycle mr-2"></i>
+                        Motorcycle World
+                    </h1>
+                </div>
+
+                <!-- Barra de Búsqueda -->
+                <div class="flex-1 max-w-2xl mx-8">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Buscar productos, marcas y más..." 
+                            class="w-full py-3 px-4 pr-12 text-sm border border-gray-300 rounded-sm focus:outline-none focus:border-ml-blue"
+                        >
+                        <button class="absolute right-0 top-0 h-full px-4 bg-ml-light-gray hover:bg-gray-300 border border-l-0 border-gray-300 rounded-r-sm">
+                            <i class="fas fa-search text-gray-600"></i>
+                        </button>
+                        <!-- Suggestions dropdown -->
+                        <div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-sm shadow-lg z-50 hidden"></div>
+                    </div>
+                </div>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-6">
+                    <!-- User Account -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center text-sm text-gray-700 hover:text-ml-blue">
+                            <i class="fas fa-user mr-2"></i>
+                            <span id="userDisplayName">Mi cuenta</span>
+                            <i class="fas fa-chevron-down ml-1"></i>
+                        </button>
+                        <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                            <div id="guestMenu">
+                                <a href="#" id="loginBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>Ingresar
+                                </a>
+                                <a href="#" id="registerBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user-plus mr-2"></i>Crear cuenta
+                                </a>
+                            </div>
+                            <div id="userMenu" class="hidden">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Mi perfil
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-box mr-2"></i>Mis compras
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-heart mr-2"></i>Favoritos
+                                </a>
+                                <!-- Admin Panel Button (will be shown via JavaScript if user is admin) -->
+                                <div id="adminMenuSection" class="hidden border-t border-gray-100">
+                                    <a href="/panel-admin/dashboard/" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                        <i class="fas fa-cog mr-2"></i>Panel Admin
+                                    </a>
+                                </div>
+                                <div class="border-t border-gray-100">
+                                    <a href="/logout/" id="logoutBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Salir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Favoritos -->
+                    <a href="#" class="flex items-center text-sm text-gray-700 hover:text-ml-blue">
+                        <i class="fas fa-heart mr-2"></i>
+                        <span class="hidden md:inline">Favoritos</span>
+                    </a>
+
+                    <!-- Carrito -->
+                    <a href="#" id="cartBtn" class="flex items-center text-sm text-gray-700 hover:text-ml-blue relative">
+                        <i class="fas fa-shopping-cart mr-2"></i>
+                        <span class="hidden md:inline">Carrito</span>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación de Categorías -->
+    <nav class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center space-x-8 py-2 text-sm">
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Cascos</a>
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Chaquetas</a>
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Guantes</a>
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Botas</a>
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Accesorios</a>
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Repuestos</a>
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Mantenimiento</a>
+                <a href="#" class="text-gray-600 hover:text-ml-blue py-2">Equipamiento</a>
+                <div class="ml-auto">
+                    <a href="#" class="text-ml-green hover:underline">
+                        <i class="fas fa-truck mr-1"></i>Envío gratis desde $50.000
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Banner Principal -->
+    <section class="bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="flex items-center justify-between">
+                <div class="max-w-2xl">
+                    <h2 class="text-4xl font-bold mb-4">
+                        Equípate para la Aventura
+                    </h2>
+                    <p class="text-xl mb-6 text-gray-200">
+                        Encuentra todo lo que necesitas para tu motocicleta. Cascos, equipamiento, repuestos y más.
+                    </p>
+                    <div class="flex space-x-4">
+                        <button class="bg-ml-blue hover:bg-blue-600 text-white px-6 py-3 rounded-md font-semibold transition duration-300">
+                            Ver Ofertas
+                        </button>
+                        <button class="border border-white text-white hover:bg-white hover:text-gray-900 px-6 py-3 rounded-md font-semibold transition duration-300">
+                            Explorar Categorías
+                        </button>
+                    </div>
+                </div>
+                <div class="hidden lg:block">
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=300&fit=crop" 
+                         alt="Motorcycle" class="rounded-lg shadow-xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Filtros y Breadcrumb -->
+        <div class="flex items-center justify-between mb-6">
+            <nav class="text-sm">
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="#" class="text-ml-blue hover:underline">Inicio</a>
+                        <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+                    </li>
+                    <li class="text-gray-500">Productos</li>
+                </ol>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-600" id="productCount">0 resultados</span>
+                <select class="text-sm border border-gray-300 rounded px-3 py-1">
+                    <option>Más relevantes</option>
+                    <option>Menor precio</option>
+                    <option>Mayor precio</option>
+                    <option>Más vendidos</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Sidebar y Productos -->
+        <div class="flex gap-6">
+            <!-- Sidebar Filtros -->
+            <aside class="w-64 flex-shrink-0">
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                    <h3 class="font-semibold text-gray-900 mb-4">Filtros</h3>
+                    
+                    <!-- Categorías -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Categorías</h4>
+                        <div id="categoryFilters" class="space-y-2">
+                            <!-- Categorías dinámicas -->
+                        </div>
+                    </div>
+
+                    <!-- Precio -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Precio</h4>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" placeholder="Mín" class="w-20 px-2 py-1 border border-gray-300 rounded text-sm">
+                            <span class="text-gray-500">-</span>
+                            <input type="number" placeholder="Máx" class="w-20 px-2 py-1 border border-gray-300 rounded text-sm">
+                            <button class="bg-ml-blue text-white px-3 py-1 rounded text-sm hover:bg-blue-600">OK</button>
+                        </div>
+                    </div>
+
+                    <!-- Marcas -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Marcas</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> Alpinestars
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> Dainese
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> AGV
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> Shoei
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Condición -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Condición</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="condition" class="mr-2"> Nuevo
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="condition" class="mr-2"> Usado
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Grid de Productos -->
+            <div class="flex-1">
+                <!-- Productos Destacados -->
+                <section class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Productos Destacados</h3>
+                    <div id="featuredProducts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Productos destacados se cargan dinámicamente -->
+                    </div>
+                </section>
+
+                <!-- Todos los Productos -->
+                <section>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Todos los Productos</h3>
+                    <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Productos se cargan dinámicamente -->
+                    </div>
+                    
+                    <!-- Loading -->
+                    <div id="loading" class="text-center py-8 hidden">
+                        <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+                        <p class="text-gray-500 mt-2">Cargando productos...</p>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div id="pagination" class="flex justify-center mt-8">
+                        <!-- Paginación se genera dinámicamente -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-lg font-bold mb-4 text-gray-900">Motorcycle World</h4>
+                    <p class="text-gray-600 text-sm">Tu tienda de confianza para accesorios de motocicleta de primera calidad.</p>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-4 text-gray-900">Acerca de</h5>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><a href="#" class="hover:text-ml-blue">Sobre nosotros</a></li>
+                        <li><a href="#" class="hover:text-ml-blue">Información de envío</a></li>
+                        <li><a href="#" class="hover:text-ml-blue">Devoluciones</a></li>
+                        <li><a href="#" class="hover:text-ml-blue">Preguntas frecuentes</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-4 text-gray-900">Categorías</h5>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><a href="#" class="hover:text-ml-blue">Cascos</a></li>
+                        <li><a href="#" class="hover:text-ml-blue">Chaquetas</a></li>
+                        <li><a href="#" class="hover:text-ml-blue">Guantes</a></li>
+                        <li><a href="#" class="hover:text-ml-blue">Botas</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-4 text-gray-900">Contacto</h5>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li>Email: info@motorcycleworld.com</li>
+                        <li>Teléfono: +57 (300) 123-4567</li>
+                        <li>Dirección: Calle 123 #45-67, Bogotá</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-gray-600">
+                <p>&copy; 2025 Motorcycle World. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Iniciar Sesión</h3>
+                    <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Usuario</label>
+                        <input type="text" id="username" name="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Contraseña</label>
+                        <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                    </div>
+                    <button type="submit" class="w-full bg-ml-blue text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors font-semibold">Ingresar</button>
+                </form>
+                <div id="loginMessage" class="mt-4 text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Crear Cuenta</h3>
+                    <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="registerForm">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Nombre</label>
+                            <input type="text" name="first_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Apellido</label>
+                            <input type="text" name="last_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Usuario</label>
+                        <input type="text" name="username" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Contraseña</label>
+                        <input type="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Confirmar Contraseña</label>
+                        <input type="password" name="password_confirm" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ml-blue" required>
+                    </div>
+                    <button type="submit" class="w-full bg-ml-blue text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors font-semibold">Crear Cuenta</button>
+                </form>
+                <div id="registerMessage" class="mt-4 text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main_ml.js"></script>
+</body>
+</html>
