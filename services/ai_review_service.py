@@ -225,9 +225,9 @@ Summary:
             dict: Statistics about the update process
         """
         if product_ids is None:
-            products = Product.objects.filter(is_active=True)
+            products = Product.objects.filter(status='active')
         else:
-            products = Product.objects.filter(id__in=product_ids, is_active=True)
+            products = Product.objects.filter(id__in=product_ids, status='active')
         
         stats = {
             'total_products': products.count(),

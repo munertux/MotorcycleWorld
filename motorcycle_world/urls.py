@@ -21,6 +21,8 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 from users.admin_auth import admin_login_view
+from products.product_views import product_detail_view, add_review, get_product_reviews
+from products.home_views import HomeView, category_products_view
 
 urlpatterns = [
     # Admin panel
@@ -40,9 +42,10 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     
     # Frontend routes (Django templates)
-    path('', TemplateView.as_view(template_name='home_ml.html'), name='home'),
+    path('', HomeView.as_view(), name='home'),
+    path('categoria/<slug:category_slug>/', category_products_view, name='category_products'),
     path('shop/', TemplateView.as_view(template_name='products.html'), name='products'),
-    path('shop/<slug:slug>/', TemplateView.as_view(template_name='product_detail.html'), name='product_detail'),
+    path('producto/<int:product_id>/', product_detail_view, name='product_detail'),
     path('cart/', TemplateView.as_view(template_name='cart.html'), name='cart'),
     path('checkout/', TemplateView.as_view(template_name='checkout.html'), name='checkout'),
     path('orders/', TemplateView.as_view(template_name='orders.html'), name='orders'),
@@ -50,6 +53,10 @@ urlpatterns = [
     path('login/', TemplateView.as_view(template_name='auth/login.html'), name='login'),
     path('register/', TemplateView.as_view(template_name='auth/register.html'), name='register'),
     path('profile/', TemplateView.as_view(template_name='profile.html'), name='profile'),
+    
+    # AJAX endpoints para reseñas
+    path('ajax/product/<int:product_id>/review/', add_review, name='add_review'),
+    path('ajax/product/<int:product_id>/reviews/', get_product_reviews, name='get_reviews'),
 ]
 
 # Serve media files in development

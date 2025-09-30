@@ -1,0 +1,116 @@
+  {# Header Principal #}
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <a href="/" class="text-2xl font-bold text-ml-blue mr-8">
+            <i class="fas fa-motorcycle mr-2"></i>
+            Motorcycle World
+          </a>
+        </div>
+
+        <!-- Barra de Búsqueda -->
+        <div class="flex-1 max-w-2xl mx-8">
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="Buscar productos, marcas y más..." class="w-full py-3 px-4 pr-12 text-sm border border-gray-300 rounded-sm focus:outline-none focus:border-ml-blue">
+            <button class="absolute right-0 top-0 h-full px-4 bg-ml-light-gray hover:bg-gray-300 border border-l-0 border-gray-300 rounded-r-sm">
+              <i class="fas fa-search text-gray-600"></i>
+            </button>
+            <!-- Suggestions dropdown -->
+            <div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-sm shadow-lg z-50 hidden"></div>
+          </div>
+        </div>
+
+        <!-- User Actions -->
+        <div class="flex items-center space-x-6">
+          <!-- User Account -->
+          <div class="relative">
+            <button id="userMenuBtn" class="flex items-center text-sm text-gray-700 hover:text-ml-blue">
+              <i class="fas fa-user mr-2"></i>
+              <span id="userDisplayName">Mi cuenta</span>
+              <i class="fas fa-chevron-down ml-1"></i>
+            </button>
+            <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+              <div id="guestMenu">
+                <a href="#" id="loginBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-sign-in-alt mr-2"></i>Ingresar
+                </a>
+                <a href="#" id="registerBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-user-plus mr-2"></i>Crear cuenta
+                </a>
+              </div>
+              <div id="userMenu" class="hidden">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-user mr-2"></i>Mi perfil
+                </a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-box mr-2"></i>Mis compras
+                </a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-heart mr-2"></i>Favoritos
+                </a>
+                <!-- Admin Panel Button (shown via JS if admin) -->
+                <div id="adminMenuSection" class="hidden border-t border-gray-100">
+                  <a href="/panel-admin/dashboard/" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                    <i class="fas fa-cog mr-2"></i>Panel Admin
+                  </a>
+                </div>
+                <div class="border-t border-gray-100">
+                  <a href="/logout/" id="logoutBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Salir
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Favoritos -->
+          <a href="#" class="flex items-center text-sm text-gray-700 hover:text-ml-blue">
+            <i class="fas fa-heart mr-2"></i>
+            <span class="hidden md:inline">Favoritos</span>
+          </a>
+
+          <!-- Carrito -->
+          <a href="#" id="cartBtn" class="flex items-center text-sm text-gray-700 hover:text-ml-blue relative">
+            <i class="fas fa-shopping-cart mr-2"></i>
+            <span class="hidden md:inline">Carrito</span>
+            <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center hidden">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {# Navegación de Categorías #}
+  <nav class="bg-white border-t border-gray-200">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center space-x-8 py-2 text-sm">
+        {% if categories %}
+          {% for category in categories %}
+            <div class="relative group">
+              <a href="{% url 'category_products' category.slug %}" class="text-gray-600 hover:text-ml-blue py-2 flex items-center">
+                {{ category.name }}
+                {% if category.subcategories.exists %}
+                  <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                {% endif %}
+              </a>
+              {% if category.subcategories.exists %}
+              <div class="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                {% for subcategory in category.subcategories.all %}
+                  <a href="{% url 'category_products' subcategory.slug %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-ml-blue">
+                    {{ subcategory.name }}
+                    {% if subcategory.product_count %}
+                      <span class="text-xs text-gray-400 ml-1">({{ subcategory.product_count }})</span>
+                    {% endif %}
+                  </a>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+

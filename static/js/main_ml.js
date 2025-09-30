@@ -334,15 +334,22 @@ function createProductCard(product, isFeatured = false) {
     const stockBadge = !product.is_in_stock ? 
         '<div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"><span class="text-white font-semibold">Agotado</span></div>' : '';
 
+    // Manejar imagen o placeholder
+    const imageContent = product.main_image ? 
+        `<img src="${product.main_image}" 
+             alt="${product.name}" 
+             class="w-full h-48 object-cover">` :
+        `<div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+             <i class="fas fa-image text-4xl text-gray-400"></i>
+         </div>`;
+
     return `
         <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 relative cursor-pointer" 
-             onclick="viewProduct('${product.slug}')">
+             onclick="viewProduct('${product.id}')">
             ${discountBadge}
             ${featuredBadge}
             <div class="relative overflow-hidden">
-                <img src="${product.main_image || '/static/images/no-image.jpg'}" 
-                     alt="${product.name}" 
-                     class="w-full h-48 object-cover">
+                ${imageContent}
                 ${stockBadge}
             </div>
             <div class="p-4">
@@ -633,10 +640,9 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-function viewProduct(slug) {
-    // Implementar navegación a detalle de producto
-    console.log('Viewing product:', slug);
-    // window.location.href = `/products/${slug}/`;
+function viewProduct(id) {
+    // Navegar a la página de detalle del producto por ID
+    window.location.href = `/producto/${id}/`;
 }
 
 // Función para aplicar filtros de precio

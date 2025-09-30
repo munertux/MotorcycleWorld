@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category.name }} - Motorcycle World</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ml-yellow': '#fff159',
+                        'ml-blue': '#3483fa',
+                        'ml-light-blue': '#4593fc',
+                        'ml-gray': '#666666',
+                        'ml-light-gray': '#f5f5f5',
+                        'ml-green': '#00a650',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-ml-light-gray">
+    {% include 'partials/store_header.html' %}
+
+    {% include 'partials/store_hero.html' %}
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Sidebar de filtros -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold mb-4">Filtros</h3>
+                    
+                    <!-- Subcategorías -->
+                    {% if subcategories %}
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Subcategorías</h4>
+                        <div class="space-y-2">
+                            {% for subcategory in subcategories %}
+                            <a href="{% url 'category_products' subcategory.slug %}" 
+                               class="block text-sm text-gray-600 hover:text-ml-blue py-1">
+                                {{ subcategory.name }}
+                                <span class="text-xs text-gray-400">({{ subcategory.products.count }})</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Filtro de precio -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-3">Precio</h4>
+                        <form method="GET" class="space-y-3">
+                            {% if current_filters.search %}
+                                <input type="hidden" name="search" value="{{ current_filters.search }}">
+                            {% endif %}
+                            <div class="flex space-x-2">
+                                <input type="number" 
+                                       name="price_min" 
+                                       placeholder="Mín" 
+                                       value="{{ current_filters.price_min|default:'' }}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+                                <input type="number" 
+                                       name="price_max" 
+                                       placeholder="Máx" 
+                                       value="{{ current_filters.price_max|default:'' }}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+                            </div>
+                            <button type="submit" class="w-full bg-ml-blue text-white py-2 rounded text-sm hover:bg-blue-600">
+                                Aplicar
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Limpiar filtros -->
+                    {% if current_filters.search or current_filters.price_min or current_filters.price_max %}
+                    <div class="pt-4 border-t border-gray-200">
+                        <a href="{% url 'category_products' category.slug %}" 
+                           class="text-sm text-red-600 hover:text-red-700">
+                            <i class="fas fa-times mr-1"></i>Limpiar filtros
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Productos -->
+            <div class="lg:col-span-3">
+                <!-- Header de productos -->
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">{{ category.name }}</h1>
+                            {% if category.description %}
+                                <p class="text-gray-600 mt-1">{{ category.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            {{ total_products }} producto{{ total_products|pluralize }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lista de productos -->
+                {% if products %}
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {% for product in products %}
+                    <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+                         onclick="viewProduct('{{ product.id }}')">
+                        <div class="aspect-square overflow-hidden rounded-t-lg">
+                            {% with main_image=product.get_main_image %}
+                                {% if main_image %}
+                                    <img src="{{ main_image.image.url }}" 
+                                         alt="{{ product.name }}" 
+                                         class="w-full h-full object-cover">
+                                {% else %}
+                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-image text-4xl text-gray-400"></i>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                        
+                        <div class="p-4">
+                            <h3 class="font-medium text-gray-900 mb-2 line-clamp-2">{{ product.name }}</h3>
+                            
+                            {% if product.original_price and product.original_price != product.price %}
+                                <div class="text-sm text-gray-500 line-through mb-1">
+                                    ${{ product.original_price|floatformat:0 }}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="text-xl font-bold text-gray-900 mb-2">
+                                ${{ product.price|floatformat:0 }}
+                            </div>
+                            
+                            {% if product.average_rating %}
+                                <div class="flex items-center mb-2">
+                                    <div class="flex items-center">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= product.average_rating %}
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-gray-300 text-sm"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-sm text-gray-600 ml-2">({{ product.review_count }})</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="flex items-center justify-between mt-3">
+                                <span class="text-green-600 text-sm">
+                                    <i class="fas fa-truck mr-1"></i>Envío gratis
+                                </span>
+                                <button class="bg-ml-blue text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors" 
+                                        onclick="event.stopPropagation(); addToCart('{{ product.id }}')">
+                                    Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Paginación -->
+                {% if products.has_other_pages %}
+                <div class="mt-8 flex justify-center">
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        {% if products.has_previous %}
+                            <a href="?page={{ products.previous_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.price_min %}&price_min={{ current_filters.price_min }}{% endif %}{% if current_filters.price_max %}&price_max={{ current_filters.price_max }}{% endif %}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-l-md">
+                                Anterior
+                            </a>
+                        {% endif %}
+                        
+                        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                            Página {{ products.number }} de {{ products.paginator.num_pages }}
+                        </span>
+                        
+                        {% if products.has_next %}
+                            <a href="?page={{ products.next_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.price_min %}&price_min={{ current_filters.price_min }}{% endif %}{% if current_filters.price_max %}&price_max={{ current_filters.price_max }}{% endif %}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-r-md">
+                                Siguiente
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <!-- Sin productos -->
+                <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+                    <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">No hay productos</h3>
+                    <p class="text-gray-600 mb-4">
+                        {% if current_filters.search or current_filters.price_min or current_filters.price_max %}
+                            No encontramos productos que coincidan con tus filtros.
+                        {% else %}
+                            Esta categoría aún no tiene productos disponibles.
+                        {% endif %}
+                    </p>
+                    {% if current_filters.search or current_filters.price_min or current_filters.price_max %}
+                        <a href="{% url 'category_products' category.slug %}" 
+                           class="text-ml-blue hover:text-blue-600">
+                            Ver todos los productos de {{ category.name }}
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% include 'partials/auth_modals.html' %}
+
+    <!-- Scripts -->
+    <script src="{% static 'js/main_ml.js' %}"></script>
+    <script>
+        function viewProduct(slug) {
+            window.location.href = `/producto/${slug}/`;
+        }
+        
+        function addToCart(productId) {
+            // Implementar función para agregar al carrito
+            console.log('Agregando producto al carrito:', productId);
+        }
+        
+        // Inicializar conteo del carrito al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof updateCartDisplay === 'function') {
+                updateCartDisplay();
+            }
+        });
+    </script>
+</body>
+</html>

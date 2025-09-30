@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from products.models import Category, Product, ProductImage, ProductVariant
 from orders.models import Cart, CartItem, Order, OrderItem, OrderStatusHistory
-from reviews.models import Review, ReviewSummary
+# Note: Reviews are only user-generated; do not seed sample reviews
 from decimal import Decimal
 import random
 
@@ -29,8 +29,7 @@ class Command(BaseCommand):
         # Create sample orders
         self.create_sample_orders()
         
-        # Create sample reviews
-        self.create_sample_reviews()
+        # Do not create fake/sample reviews. Reviews should be real user content.
         
         self.stdout.write(self.style.SUCCESS('Database populated successfully!'))
 
@@ -446,58 +445,7 @@ class Command(BaseCommand):
             
             self.stdout.write(f'Created order for {customer.username}')
 
-    def create_sample_reviews(self):
-        self.stdout.write('Creating sample reviews...')
-        
-        customers = User.objects.filter(role='customer')
-        products = Product.objects.filter(status='active')
-        
-        if not customers.exists() or not products.exists():
-            return
-        
-        sample_reviews = [
-            {
-                'rating': 5,
-                'title': 'Excelente calidad',
-                'comment': 'Producto de excelente calidad, muy recomendado. Llegó en perfecto estado y cumple todas las expectativas.'
-            },
-            {
-                'rating': 4,
-                'title': 'Muy bueno',
-                'comment': 'Muy buen producto, aunque el envío tardó un poco más de lo esperado. La calidad es muy buena.'
-            },
-            {
-                'rating': 5,
-                'title': 'Perfecto',
-                'comment': 'Exactamente lo que necesitaba. Excelente atención al cliente y entrega rápida.'
-            },
-            {
-                'rating': 4,
-                'title': 'Recomendado',
-                'comment': 'Buen producto por el precio. Lo recomiendo para quien busque calidad-precio.'
-            }
-        ]
-        
-        # Create reviews for some products
-        for product in products[:6]:  # First 6 products
-            for i in range(random.randint(1, 3)):  # 1-3 reviews per product
-                if customers.exists():
-                    customer = random.choice(customers)
-                    review_data = random.choice(sample_reviews)
-                    
-                    review, created = Review.objects.get_or_create(
-                        product=product,
-                        user=customer,
-                        defaults={
-                            **review_data,
-                            'is_approved': True
-                        }
-                    )
-                    
-                    if created:
-                        self.stdout.write(f'Created review for {product.name}')
-
-        self.stdout.write(self.style.SUCCESS('Sample data creation completed!'))
+    # Removed seeding of sample reviews to keep only real user-generated reviews
     
     def create_categories(self):
         """Create product categories"""
