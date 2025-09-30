@@ -5,7 +5,8 @@ from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
 from products.models import Product, Category
-from reviews.models import Review
+from reviews.models import Review, ReviewSummary
+from services.ai_review_service import ai_review_service
 import json
 
 def product_detail_view(request, product_id):
@@ -41,13 +42,17 @@ def product_detail_view(request, product_id):
         status='active'
     ).exclude(id=product.id)[:6]
     
+    # Obtener resumen de IA si existe
+    review_summary = ReviewSummary.objects.filter(product=product).first()
+
     context = {
         'product': product,
         'reviews': reviews_page,
         'review_stats': review_stats,
         'rating_distribution': rating_distribution,
         'related_products': related_products,
-        'user_has_reviewed': False
+        'user_has_reviewed': False,
+        'review_summary': review_summary,
     }
     # Categorías principales para el header compartido
     main_categories = Category.objects.filter(
@@ -102,6 +107,12 @@ def add_review(request, product_id):
             rating=rating,
             comment=comment
         )
+        
+        # Actualizar/resumir con IA (mejor esfuerzo)
+        try:
+            ai_review_service.update_product_summary(product.id)
+        except Exception:
+            pass
         
         return JsonResponse({
             'success': True,

@@ -112,6 +112,27 @@
                         {% endif %}
                     </div>
 
+                    <!-- AI Review Summary -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-semibold text-blue-900 flex items-center">
+                                <i class="fas fa-robot mr-2"></i>Resumen de opiniones (IA)
+                            </h3>
+                            {% if review_summary %}
+                                <span class="text-xs text-blue-700">Actualizado: {{ review_summary.last_updated|date:"d/m/Y H:i" }}</span>
+                            {% endif %}
+                        </div>
+                        {% if review_summary %}
+                            <p class="text-blue-900">{{ review_summary.summary }}</p>
+                            <div class="mt-2 text-sm text-blue-800">
+                                <span class="mr-4">Opiniones analizadas: {{ review_summary.total_reviews }}</span>
+                                <span>Promedio: {{ review_summary.average_rating }}</span>
+                            </div>
+                        {% else %}
+                            <p class="text-blue-900">Aún no hay resumen de IA para este producto.</p>
+                        {% endif %}
+                    </div>
+
                     <!-- Stock Status -->
                     <div>
                         {% if product.stock_quantity > 0 %}

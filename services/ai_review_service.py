@@ -5,12 +5,16 @@ This service handles the generation and updating of AI-powered review summaries
 for products using OpenAI's GPT models.
 """
 
-import openai
+try:
+    from openai import OpenAI
+except Exception:  # pragma: no cover
+    OpenAI = None
 import logging
 from django.conf import settings
 from django.db import transaction
 from reviews.models import Review, ReviewSummary
 from products.models import Product
+from django.db.models import Avg
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +24,27 @@ class AIReviewSummaryService:
     """
     
     def __init__(self):
-        """Initialize the OpenAI client."""
-        if not settings.OPENAI_API_KEY:
-            logger.warning("OpenAI API key not configured")
-            self.client = None
-        else:
-            openai.api_key = settings.OPENAI_API_KEY
-            self.client = openai
+        """Defer OpenAI client initialization to runtime to avoid startup errors."""
+        self.client = None
+        self.api_key = getattr(settings, 'OPENAI_API_KEY', '')
+
+    def _ensure_client(self) -> bool:
+        """Create the OpenAI client only when needed. Return True if ready."""
+        if self.client is not None:
+            return True
+        if not self.api_key or OpenAI is None:
+            logger.warning("OpenAI disabled (missing API key or SDK)")
+            return False
+        try:
+            self.client = OpenAI(api_key=self.api_key)
+            return True
+        except TypeError as e:
+            # Common when httpx/openai versions mismatch
+            logger.error(f"Failed to init OpenAI client (dependency mismatch): {e}")
+        except Exception as e:
+            logger.error(f"Failed to init OpenAI client: {e}")
+        self.client = None
+        return False
     
     def generate_summary(self, product_id: int) -> str:
         """
@@ -38,9 +56,8 @@ class AIReviewSummaryService:
         Returns:
             str: Generated summary text
         """
-        if not self.client:
-            logger.error("OpenAI client not initialized - API key missing")
-            return "AI summary unavailable - API key not configured"
+        if not self._ensure_client():
+            return ""
         
         try:
             product = Product.objects.get(id=product_id)
@@ -73,20 +90,24 @@ class AIReviewSummaryService:
             )
             
             # Call OpenAI API
-            response = self.client.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {
-                        "role": "system", 
-                        "content": "You are a helpful assistant that summarizes product reviews for an e-commerce site. Provide concise, balanced summaries that highlight key themes in customer feedback."
+                        "role": "system",
+                        "content": (
+                            "You are a helpful assistant that summarizes product reviews for an "
+                            "e-commerce site. Provide concise, balanced summaries that highlight "
+                            "key themes in customer feedback."
+                        ),
                     },
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=300,
-                temperature=0.7
+                temperature=0.7,
             )
-            
-            summary = response.choices[0].message.content.strip()
+
+            summary = (response.choices[0].message.content or "").strip()
             
             # Calculate sentiment score (simple approach based on average rating)
             sentiment_score = self._calculate_sentiment_score(avg_rating)
@@ -127,9 +148,7 @@ class AIReviewSummaryService:
                 summary_text = self.generate_summary(product_id)
                 
                 # Calculate stats
-                avg_rating = reviews.aggregate(
-                    avg=models.Avg('rating')
-                )['avg'] or 0
+                avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
                 total_reviews = reviews.count()
                 sentiment_score = self._calculate_sentiment_score(avg_rating)
                 
