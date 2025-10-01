@@ -23,6 +23,26 @@ class MotorcycleWorldApp {
         document.getElementById('closeLoginModal').addEventListener('click', () => this.closeModal('loginModal'));
         document.getElementById('closeRegisterModal').addEventListener('click', () => this.closeModal('registerModal'));
         
+        // Logout links (ensure tokens are cleared before server logout)
+        try {
+            const logoutLink = document.getElementById('logoutBtn') || document.getElementById('logoutLink');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.logout();
+                    window.location.href = '/logout/';
+                });
+            }
+            // Fallback: capture any anchor pointing to /logout/
+            document.querySelectorAll('a[href="/logout/"]').forEach(a => {
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.logout();
+                    window.location.href = '/logout/';
+                });
+            });
+        } catch (err) {}
+
         // Form submissions
         document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
         document.getElementById('registerForm').addEventListener('submit', (e) => this.handleRegister(e));

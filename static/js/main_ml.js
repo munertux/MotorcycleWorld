@@ -565,8 +565,10 @@ function updateAuthUI() {
         guestMenu.classList.add('hidden');
         userMenu.classList.remove('hidden');
         
-        // Mostrar panel admin si el usuario es administrador
-        if (currentUser.role === 'admin' || currentUser.is_admin) {
+        // Mostrar panel admin si el usuario es administrador o superadmin
+        const role = (currentUser.role || '').toLowerCase();
+        const isAdminLike = role === 'admin' || role === 'superadmin' || currentUser.is_admin || currentUser.is_staff || currentUser.is_superuser;
+        if (isAdminLike) {
             adminMenuSection.classList.remove('hidden');
         } else {
             adminMenuSection.classList.add('hidden');

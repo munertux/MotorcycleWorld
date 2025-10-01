@@ -5,10 +5,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import redirect
+from django.conf import settings
 from .models import User
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
@@ -71,6 +74,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     'last_name': user.last_name,
                     'is_admin': user.is_admin,
                     'is_customer': user.is_customer,
+                    'is_staff': getattr(user, 'is_staff', False),
+                    'is_superuser': getattr(user, 'is_superuser', False),
                 }
                 # Crear sesión de Django en el mismo login API para evitar doble login
                 if username and password:
@@ -142,7 +147,12 @@ class AdminPermission(permissions.BasePermission):
         return (
             request.user and 
             request.user.is_authenticated and 
-            request.user.is_admin
+            (
+                getattr(request.user, 'is_admin', False) or
+                getattr(request.user, 'is_staff', False) or
+                getattr(request.user, 'is_superuser', False) or
+                getattr(request.user, 'role', '') == 'superadmin'
+            )
         )
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -155,6 +165,23 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         return User.objects.all()
+
+def logout_view(request):
+    """
+    Synchronous logout view that accepts GET or POST, logs out the user
+    and redirects to LOGOUT_REDIRECT_URL or '/'.
+    Fixes HTTP 405 issues from default LogoutView expectations.
+    """
+    if request.method in ['GET', 'POST']:
+        try:
+            logout(request)
+            # Ensure session is flushed
+            request.session.flush()
+        except Exception:
+            pass
+        next_page = request.GET.get('next') or getattr(settings, 'LOGOUT_REDIRECT_URL', '/') or '/'
+        return redirect(next_page)
+    return HttpResponseNotAllowed(['GET', 'POST'])
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])

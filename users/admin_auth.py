@@ -10,7 +10,7 @@ def admin_login_view(request):
     # Si ya está autenticado y es admin, redirigir directamente
     if request.method == 'GET' and request.user.is_authenticated:
         next_url = request.GET.get('next', '/panel-admin/dashboard/')
-        if getattr(request.user, 'role', None) == 'admin':
+        if getattr(request.user, 'role', '') in ('admin', 'superadmin') or getattr(request.user, 'is_staff', False) or getattr(request.user, 'is_superuser', False):
             return redirect(next_url)
         else:
             messages.error(request, 'No tienes permisos de administrador.')
@@ -22,7 +22,7 @@ def admin_login_view(request):
         
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            if user.role == 'admin':
+            if getattr(user, 'role', '') in ('admin', 'superadmin') or getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False):
                 login(request, user)
                 # Mantener sesión por 8 horas
                 request.session.set_expiry(60 * 60 * 8)

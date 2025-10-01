@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
+from users.views import logout_view
 from users.admin_auth import admin_login_view
 from products.product_views import product_detail_view, add_review, get_product_reviews
 from products.home_views import HomeView, category_products_view
@@ -39,7 +40,7 @@ urlpatterns = [
     
     # Authentication routes
     path('accounts/login/', admin_login_view, name='admin_login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    path('logout/', logout_view, name='logout'),
     
     # Frontend routes (Django templates)
     path('', HomeView.as_view(), name='home'),

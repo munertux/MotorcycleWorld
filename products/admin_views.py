@@ -14,7 +14,13 @@ from orders.models import Order
 
 def is_admin(user):
     """Verificar si el usuario es administrador"""
-    return user.is_authenticated and user.role == 'admin'
+    return (
+        user.is_authenticated and (
+            getattr(user, 'role', '') in ('admin', 'superadmin') or
+            getattr(user, 'is_staff', False) or
+            getattr(user, 'is_superuser', False)
+        )
+    )
 
 
 @login_required
