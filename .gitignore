@@ -144,11 +144,39 @@ cython_debug/
 # Specific to this project
 media/
 staticfiles/
+.env
 .env.local
 .env.production
+.env.development
 
 # Database
 *.db
+motorcycle_world.log
+
+# Settings específicos por entorno
+motorcycle_world/settings_local.py
+motorcycle_world/settings_production.py
+motorcycle_world/settings_development.py
+
+# Proteger configuración actual si la renombras
+motorcycle_world/settings_current.py
+
+# Archivos de configuración del servidor
+gunicorn.conf.py
+nginx.conf
+supervisor.conf
+uwsgi.ini
+
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.cer
+
+# Backups
+*.backup
+*.bak
+*.dump
 
 # Node modules (if using any frontend tools)
 node_modules/
